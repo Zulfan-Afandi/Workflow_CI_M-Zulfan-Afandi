@@ -5,7 +5,7 @@ Repo ini berisi MLflow Project + GitHub Actions CI yang otomatis:
 2. Build image Docker dan push ke Docker Hub (kalau secrets sudah diisi).
 
 ## Docker Hub
-Image: https://hub.docker.com/r/<DOCKERHUB_USERNAME>/heart-disease-model
+Image: https://hub.docker.com/r/jajangbakwan/heart-disease-model
 (ganti `<DOCKERHUB_USERNAME>` dengan username Docker Hub kamu setelah CI berhasil push)
 
 ## Setup yang perlu dilakukan sekali di GitHub (Settings > Secrets and variables > Actions):
