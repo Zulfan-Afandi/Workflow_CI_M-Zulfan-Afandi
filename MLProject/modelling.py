@@ -39,7 +39,13 @@ def main():
     if not os.environ.get("MLFLOW_TRACKING_URI"):
         mlflow.set_tracking_uri("file:./mlruns")
 
-    mlflow.set_experiment("Heart_Disease_Workflow_CI")
+    # Kalau dijalankan lewat `mlflow run`, MLflow CLI sudah membuat run aktif
+    # (MLFLOW_RUN_ID sudah diset). Jangan panggil set_experiment/start_run lagi
+    # di kasus itu, karena akan bentrok ("active run ID does not match").
+    run_started_by_cli = os.environ.get("MLFLOW_RUN_ID") is not None
+
+    if not run_started_by_cli:
+        mlflow.set_experiment("Heart_Disease_Workflow_CI")
 
     X_train, X_test, y_train, y_test = load_train_test()
 
@@ -51,7 +57,7 @@ def main():
         "random_state": 42,
     }
 
-    with mlflow.start_run(run_name="ci_random_forest"):
+    def run_training():
         model = RandomForestClassifier(**params)
         model.fit(X_train, y_train)
 
@@ -72,6 +78,13 @@ def main():
         print(f"Precision: {prec:.4f}")
         print(f"Recall   : {rec:.4f}")
         print(f"F1-Score : {f1:.4f}")
+
+    if run_started_by_cli:
+        # Run sudah aktif dari `mlflow run`, langsung pakai run itu
+        run_training()
+    else:
+        with mlflow.start_run(run_name="ci_random_forest"):
+            run_training()
 
 
 if __name__ == "__main__":
